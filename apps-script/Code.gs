@@ -13,8 +13,9 @@
  * 비밀번호는 스크립트 속성에만 있으므로 사이트 소스에는 드러나지 않는다.
  */
 
-const SHEET_NAME = '참석 회신';
-const HEADER = ['ID', '성함', '연락처', '참석 인원', '개인정보 동의', '회신 일시'];
+// 1부·2부로 나뉘면서 칸이 바뀌어 새 탭에 쌓는다 (예전 '참석 회신' 탭은 지워도 됨)
+const SHEET_NAME = '참석 회신 (1부·2부)';
+const HEADER = ['ID', '성함', '연락처', '1부', '1부 인원', '2부', '2부 인원', '개인정보 동의', '회신 일시'];
 
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -46,7 +47,9 @@ function doPost(e) {
     const id = String(b.id || '');
     const name = String(b.name || '').trim().slice(0, 30);
     const phone = String(b.phone || '').trim().slice(0, 20);
-    const count = Math.max(1, Math.min(20, Math.floor(Number(b.count)) || 1));
+    // 인원 0 = 불참
+    const part = function (v) { return Math.max(0, Math.min(20, Math.floor(Number(v)) || 0)); };
+    const p1 = part(b.p1), p2 = part(b.p2);
     if (!/^[A-Za-z0-9-]{8,40}$/.test(id) || !name || phone.replace(/\D/g, '').length < 9 || b.agree !== true) {
       return out_({ ok: false, error: 'invalid' });
     }
@@ -54,7 +57,7 @@ function doPost(e) {
     lock.waitLock(10000);
     try {
       const sh = sheet_();
-      const row = [id, safe_(name), safe_(phone), count, '동의', new Date()];
+      const row = [id, safe_(name), safe_(phone), p1 > 0 ? '참석' : '불참', p1, p2 > 0 ? '참석' : '불참', p2, '동의', new Date()];
       const last = sh.getLastRow();
       const ids = last > 1 ? sh.getRange(2, 1, last - 1, 1).getValues().map(function (r) { return r[0]; }) : [];
       const at = ids.indexOf(id);
@@ -74,9 +77,10 @@ function doPost(e) {
       return {
         name: String(r[1]),
         phone: String(r[2]),
-        count: Number(r[3]) || 1,
-        agree: r[4] === '동의',
-        updatedAt: r[5] instanceof Date ? r[5].toISOString() : String(r[5])
+        p1: Number(r[4]) || 0,
+        p2: Number(r[6]) || 0,
+        agree: r[7] === '동의',
+        updatedAt: r[8] instanceof Date ? r[8].toISOString() : String(r[8])
       };
     });
     return out_({ ok: true, rows: rows });
