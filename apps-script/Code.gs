@@ -29,6 +29,21 @@ function sheet_() {
   return sh;
 }
 
+// 축하의 말 — 사이트에 공개된다. 지우고 싶은 글은 시트에서 그 줄을 삭제하면 사이트에서도 사라진다
+const CHEER_SHEET = '축하의 말';
+const CHEER_HEADER = ['기기 ID', '축하의 말', '남긴 일시'];
+
+function cheerSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(CHEER_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(CHEER_SHEET);
+    sh.appendRow(CHEER_HEADER);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+
 function out_(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -63,6 +78,16 @@ function doPost(e) {
       const at = ids.indexOf(id);
       // 같은 기기에서 다시 회신하면 새 줄을 만들지 않고 고친다
       sh.getRange(at >= 0 ? at + 2 : last + 1, 1, 1, row.length).setValues([row]);
+      // 축하의 말도 함께 왔으면 '축하의 말' 탭에 넣는다 (같은 기기면 고친다)
+      const msg = String(b.msg || '').trim().slice(0, 300);
+      if (msg) {
+        const ch = cheerSheet_();
+        const cl = ch.getLastRow();
+        const cids = cl > 1 ? ch.getRange(2, 1, cl - 1, 1).getValues().map(function (r) { return r[0]; }) : [];
+        const ci = cids.indexOf(id);
+        const crow = [id, safe_(msg), new Date()];
+        ch.getRange(ci >= 0 ? ci + 2 : cl + 1, 1, 1, crow.length).setValues([crow]);
+      }
     } finally {
       lock.releaseLock();
     }
@@ -84,6 +109,20 @@ function doPost(e) {
       };
     });
     return out_({ ok: true, rows: rows });
+  }
+
+  if (b.action === 'cheers') {
+    // 최근 글부터 100개까지 (기기 ID는 내보내지 않는다)
+    const list = cheerSheet_().getDataRange().getValues().slice(1)
+      .filter(function (r) { return r[1]; })
+      .map(function (r) {
+        return {
+          msg: String(r[1]).replace(/^'/, ''),
+          at: r[2] instanceof Date ? r[2].toISOString() : String(r[2])
+        };
+      })
+      .reverse().slice(0, 100);
+    return out_({ ok: true, list: list });
   }
 
   return out_({ ok: false, error: 'unknown_action' });
