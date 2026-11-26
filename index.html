@@ -114,15 +114,15 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
 .admin-lock { display: grid; grid-template-columns: minmax(0,1fr) 96px; gap: 8px; align-items: end; padding: 0 16px 16px; }
 .admin-lock .btn { min-height: 48px; font-size: 15px; }
 .admin-lock .note { grid-column: 1 / -1; margin: 0; text-align: left; }
-.consent { background: #fff; border: 1.5px solid #E6DDB8; border-radius: 14px; padding: 14px; font-size: 13px; color: var(--muted); }
-.consent b { display: block; color: var(--forest); font-size: 14px; margin-bottom: 8px; }
+.consent { background: #fff; border: 1.5px solid #E6DDB8; border-radius: 12px; padding: 10px 12px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.consent b { display: block; color: var(--forest); font-size: 12.5px; margin-bottom: 4px; }
 .consent table { border-collapse: collapse; width: 100%; }
-.consent th, .consent td { text-align: left; vertical-align: top; padding: 5px 0; border-top: 1px solid #F0E6C0; }
-.consent th { width: 72px; font-weight: 700; color: #6B5A1E; white-space: nowrap; }
+.consent th, .consent td { text-align: left; vertical-align: top; padding: 2px 0; border-top: 1px solid #F3EBCB; }
+.consent th { width: 56px; font-weight: 700; color: #6B5A1E; white-space: nowrap; }
 .consent td { color: var(--ink); }
-.consent p { margin: 10px 0 0; line-height: 1.55; }
-.agree { display: flex; gap: 10px; align-items: center; margin-top: 12px; min-height: 44px; cursor: pointer; font-size: 14.5px; font-weight: 700; color: var(--ink); }
-.agree input { width: 22px; height: 22px; accent-color: var(--forest); flex-shrink: 0; }
+.consent p { margin: 6px 0 0; line-height: 1.5; }
+.agree { display: flex; gap: 8px; align-items: center; margin-top: 8px; min-height: 40px; cursor: pointer; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.agree input { width: 20px; height: 20px; accent-color: var(--forest); flex-shrink: 0; }
 .agree em { color: #C0392B; font-style: normal; font-weight: 500; }
 .stats.one, .admin-tools.one { grid-template-columns: 1fr; }
 .stats.two { grid-template-columns: 1fr 1fr; }
@@ -235,7 +235,7 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
             <tr><th>이용 목적</th><td>‘참빛 좋은 날’ 참석 확인, 식사 준비, 행사 관련 안내 연락</td></tr>
             <tr><th>보유 기간</th><td>행사 종료 후 1개월 이내 파기</td></tr>
           </table>
-          <p>위 개인정보 수집·이용에 동의하지 않으실 수 있으며, 동의하지 않으시면 이 페이지에서 참석 회신을 하실 수 없습니다. 이 경우 학교(051-364-4211)로 연락해 주세요.</p>
+          <p>동의하지 않으실 수 있으며, 이 경우 학교(051-364-4211)로 회신해 주세요.</p>
           <label class="agree"><input type="checkbox" name="agree" required><span>개인정보 수집·이용에 동의합니다 <em>(필수)</em></span></label>
         </div>
         <button type="submit" class="btn primary" id="rsvp-submit">참석 회신하기</button>
