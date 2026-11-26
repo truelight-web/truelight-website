@@ -145,10 +145,6 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
 .cheer-card { background: #FFFBEA; }
 .cheer-card .lead { margin: 0; font-size: 15px; }
 .fld .count { align-self: flex-end; font-size: 12px; color: var(--muted); margin-top: -2px; font-variant-numeric: tabular-nums; }
-.cheers { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-height: 420px; overflow-y: auto; }
-.cheers li { background: #fff; border: 1.5px solid #E6DDB8; border-radius: 14px; padding: 12px 14px; }
-.cheers p { margin: 0; font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; }
-.cheers .by { display: flex; justify-content: flex-end; margin-top: 6px; font-size: 12.5px; color: var(--muted); }
 @media (prefers-reduced-motion: no-preference) { .bubble { animation: bob 3s ease-in-out infinite; } @keyframes bob { 50% { transform: rotate(3deg) translateY(-3px); } } }
 </style>
 
@@ -207,9 +203,7 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
     <section class="card cheer-card" id="cheer-card">
       <h2>축하의 말씀을 남겨주세요~</h2>
       <p class="lead">참빛의 열다섯 번째 생일에 따뜻한 한마디를 남겨 주세요.</p>
-      <label class="fld" style="margin-top:16px"><span class="sr">축하의 말</span><textarea id="cheer-msg" maxlength="300" placeholder="참빛 15주년을 축하합니다! (참석 회신과 함께 전해져요)"></textarea><small class="count" id="cheer-count">0 / 300</small></label>
-      <ul class="cheers" id="cheers" aria-label="남겨 주신 축하의 말"></ul>
-      <p class="note" id="cheers-empty" hidden>첫 번째 축하의 말을 남겨 주세요!</p>
+      <label class="fld" style="margin-top:16px"><span class="sr">축하의 말</span><textarea id="cheer-msg" maxlength="300" placeholder="참빛 15주년을 축하합니다! (참석 회신과 함께 학교에 전해져요)"></textarea><small class="count" id="cheer-count">0 / 300</small></label>
     </section>
 
     <section class="card" style="background:var(--cream)" id="rsvp-card">
@@ -277,7 +271,7 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
           <button type="button" class="btn primary" id="xlsx">엑셀로 받기</button>
           <button type="button" class="btn ghost" id="reload">새로고침</button>
         </div>
-        <div class="tbl-wrap"><table class="tbl"><thead><tr><th class="n">번호</th><th>성함</th><th>연락처</th><th class="n">1부</th><th class="n">2부</th><th>회신일</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr><th class="n">번호</th><th>성함</th><th>연락처</th><th class="n">1부</th><th class="n">2부</th><th>축하의 말</th><th>회신일</th></tr></thead><tbody id="rows"></tbody></table></div>
         <p class="note" id="admin-empty">아직 들어온 회신이 없어요.</p>
         <p class="note">새 회신은 20초마다 자동으로 반영돼요. 목록은 관리자 비밀번호를 아는 사람에게만 보여요.</p>
       </div>
@@ -341,21 +335,6 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
   var cmsg = $('cheer-msg');
   function cheerCount() { $('cheer-count').textContent = cmsg.value.length + ' / 300'; }
   cmsg.addEventListener('input', cheerCount);
-  function day(iso) { var d = new Date(iso); return isNaN(d) ? '' : (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; }
-  function showCheers(list) {
-    var ul = $('cheers'); ul.textContent = '';
-    list.forEach(function (c) {
-      var li = document.createElement('li'), p = document.createElement('p'), by = document.createElement('div');
-      p.textContent = c.msg; by.textContent = day(c.at); by.className = 'by';
-      li.appendChild(p); li.appendChild(by); ul.appendChild(li);
-    });
-    $('cheers-empty').hidden = list.length > 0;
-  }
-  function loadCheers() {
-    if (!READY) return;
-    call({ action: 'cheers' }).then(function (res) { if (res.ok) showCheers(res.list || []); }).catch(function () {});
-  }
-  loadCheers();
 
   function showDone(d) {
     form.hidden = true; $('rsvp-done').hidden = false;
@@ -396,7 +375,7 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
     call({ action: 'rsvp', id: rid, name: name, phone: phone, p1: p1, p2: p2, agree: true, msg: msg }).then(function (res) {
       if (!res.ok) throw new Error(res.error);
       store('rsvp-last2', JSON.stringify(data));
-      status.textContent = ''; showDone(data); say(msg ? '회신과 축하의 말이 저장되었어요.' : '회신이 저장되었어요.'); if (msg) loadCheers();
+      status.textContent = ''; showDone(data); say(msg ? '회신과 축하의 말이 저장되었어요.' : '회신이 저장되었어요.');
     }).catch(function () {
       status.textContent = '저장하지 못했어요. 잠시 후 다시 눌러 주세요. 계속 안 되면 학교(051-364-4211)로 연락해 주세요.';
     }).then(function () { submit.disabled = false; });
@@ -434,8 +413,8 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
     var tb = $('rows'); tb.textContent = '';
     rows.forEach(function (r, i) {
       var tr = document.createElement('tr');
-      [i + 1, r.name, r.phone, partText(r.p1), partText(r.p2), fmt(r.updatedAt)].forEach(function (v, j) {
-        var td = document.createElement('td'); td.textContent = v == null ? '' : v; if (j === 0 || j === 3 || j === 4) td.className = 'n'; tr.appendChild(td);
+      [i + 1, r.name, r.phone, partText(r.p1), partText(r.p2), r.msg, fmt(r.updatedAt)].forEach(function (v, j) {
+        var td = document.createElement('td'); td.textContent = v == null ? '' : v; if (j === 0 || j === 3 || j === 4) td.className = 'n'; if (j === 5) td.className = 'msg'; tr.appendChild(td);
       });
       tb.appendChild(tr);
     });
@@ -446,15 +425,15 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
   $('xlsx').addEventListener('click', function () {
     if (!rows.length) { say('받을 회신이 아직 없어요.'); return; }
     if (!window.XLSX) { say('엑셀 도구를 불러오지 못했어요. 새로고침해 주세요.'); return; }
-    var aoa = [['번호', '성함', '연락처', '1부', '1부 인원', '2부', '2부 인원', '개인정보 수집·이용 동의', '회신 일시']];
+    var aoa = [['번호', '성함', '연락처', '1부', '1부 인원', '2부', '2부 인원', '축하의 말', '개인정보 수집·이용 동의', '회신 일시']];
     rows.forEach(function (r, i) {
       var d = new Date(r.updatedAt);
       var a = Number(r.p1) || 0, b = Number(r.p2) || 0;
-      aoa.push([i + 1, r.name, r.phone, a > 0 ? '참석' : '불참', a, b > 0 ? '참석' : '불참', b, r.agree ? '동의' : '', isNaN(d) ? '' : d.toLocaleString('ko-KR')]);
+      aoa.push([i + 1, r.name, r.phone, a > 0 ? '참석' : '불참', a, b > 0 ? '참석' : '불참', b, r.msg || '', r.agree ? '동의' : '', isNaN(d) ? '' : d.toLocaleString('ko-KR')]);
     });
     aoa.push([]); aoa.push(['합계', rows.length + '건', '', '', sum('p1'), '', sum('p2')]);
     var ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws['!cols'] = [{ wch: 6 }, { wch: 12 }, { wch: 16 }, { wch: 6 }, { wch: 9 }, { wch: 6 }, { wch: 9 }, { wch: 22 }, { wch: 24 }];
+    ws['!cols'] = [{ wch: 6 }, { wch: 12 }, { wch: 16 }, { wch: 6 }, { wch: 9 }, { wch: 6 }, { wch: 9 }, { wch: 40 }, { wch: 22 }, { wch: 24 }];
     var wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, '참석 회신');
     var t = new Date(), fn = '참빛좋은날_참석회신_' + t.getFullYear() + String(t.getMonth() + 1).padStart(2, '0') + String(t.getDate()).padStart(2, '0') + '.xlsx';
     XLSX.writeFile(wb, fn);

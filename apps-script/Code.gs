@@ -29,7 +29,7 @@ function sheet_() {
   return sh;
 }
 
-// 축하의 말 — 사이트에 공개된다. 지우고 싶은 글은 시트에서 그 줄을 삭제하면 사이트에서도 사라진다
+// 축하의 말 — 공개하지 않고 관리자 목록·엑셀에서만 본다 (회신과 같은 기기 ID로 묶는다)
 const CHEER_SHEET = '축하의 말';
 const CHEER_HEADER = ['기기 ID', '축하의 말', '남긴 일시'];
 
@@ -98,8 +98,11 @@ function doPost(e) {
     const pw = PropertiesService.getScriptProperties().getProperty('ADMIN_PW');
     if (!pw || String(b.pw || '') !== pw) return out_({ ok: false, error: 'wrong_pw' });
     const values = sheet_().getDataRange().getValues().slice(1);
+    const msgs = {};
+    cheerSheet_().getDataRange().getValues().slice(1).forEach(function (r) { if (r[0]) msgs[r[0]] = String(r[1]).replace(/^'/, ''); });
     const rows = values.filter(function (r) { return r[0]; }).map(function (r) {
       return {
+        msg: msgs[r[0]] || '',
         name: String(r[1]),
         phone: String(r[2]),
         p1: Number(r[4]) || 0,
@@ -109,20 +112,6 @@ function doPost(e) {
       };
     });
     return out_({ ok: true, rows: rows });
-  }
-
-  if (b.action === 'cheers') {
-    // 최근 글부터 100개까지 (기기 ID는 내보내지 않는다)
-    const list = cheerSheet_().getDataRange().getValues().slice(1)
-      .filter(function (r) { return r[1]; })
-      .map(function (r) {
-        return {
-          msg: String(r[1]).replace(/^'/, ''),
-          at: r[2] instanceof Date ? r[2].toISOString() : String(r[2])
-        };
-      })
-      .reverse().slice(0, 100);
-    return out_({ ok: true, list: list });
   }
 
   return out_({ ok: false, error: 'unknown_action' });
