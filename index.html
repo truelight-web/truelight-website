@@ -67,8 +67,8 @@ main { padding: 26px 18px 10px; display: flex; flex-direction: column; gap: 18px
 .contact .num { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
 /* 문의: 제목·학교·번호·버튼을 한 줄로 */
 .contact-card { padding: 12px 16px; }
-.contact-card .contact { flex-wrap: nowrap; gap: 10px; justify-content: center; }
-.contact-card h2 { margin: 0; font-size: 20px; flex-shrink: 0; }
+.contact-card .contact { flex-wrap: nowrap; gap: 10px; justify-content: center; align-items: baseline; }
+.contact-card h2 { margin: 0; font-size: 20px; flex-shrink: 0; position: relative; top: 2px; } /* Jua 글꼴이 높게 앉아 옆 글자와 가운데를 맞춘다 */
 .contact-card .who { flex: 0 1 auto; min-width: 0; font-size: 14.5px; line-height: 1.35; }
 .contact-card .num { font-size: 14px; font-weight: 500; white-space: nowrap; }
 .contact-card .copy { flex-shrink: 0; font-size: 13px; padding: 6px 12px; min-height: 36px; }
@@ -106,10 +106,11 @@ footer img { display: block; height: 30px; width: auto; margin: 0 auto 8px; }
 .done span { display: block; font-size: 14px; color: var(--muted); margin-top: 4px; }
 .admin { padding: 0 18px 40px; }
 .admin details { background: #fff; border: 2px dashed #9FB5A8; border-radius: 18px; }
-.admin summary { cursor: pointer; padding: 14px 16px; display: flex; align-items: baseline; gap: 10px; font-weight: 800; color: var(--forest); list-style: none; }
+.admin summary { cursor: pointer; padding: 14px 16px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; color: var(--forest); list-style: none; }
 .admin summary::-webkit-details-marker { display: none; }
-.admin summary::before { content: '🔒'; }
-.admin summary small { font-weight: 500; color: var(--muted); font-size: 13px; }
+.admin summary::before { content: '🔒'; position: relative; top: -2px; }
+.admin summary small { font-weight: 500; color: var(--muted); font-size: 13px; line-height: 1; position: relative; top: 1px; }
+.admin summary span, .admin summary::before { line-height: 1; }
 .admin-body { padding: 0 16px 16px; }
 .admin-lock { display: grid; grid-template-columns: minmax(0,1fr) 96px; gap: 8px; align-items: end; padding: 0 16px 16px; }
 .admin-lock .btn { min-height: 48px; font-size: 15px; }
